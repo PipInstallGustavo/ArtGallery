@@ -1,0 +1,4 @@
+tipo,titulo,autor,ativa,resolucao,software,poligonos,engine,algoritmo,seed
+PINTURA,Aurora Neon,Alice,true,1080p,PicsArt,null,null,null,null
+PINTURA,MinhaPintura,Gustavo,true,4k,photoshop,null,null,null,null
+GENERATIVA,MinhaArteGen,Letícia J. M.,true,null,null,null,null,skdjf,1234
