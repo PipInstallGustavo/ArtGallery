@@ -22,7 +22,6 @@ public class TelaPrincipal extends JFrame {
     private JButton btnTopObras;
     private JButton btnAtualizar;
     private JButton btnDesativar;
-    private JButton btnRemover;
 
     private JTextArea areaTextoExibicao;
 
@@ -53,7 +52,6 @@ public class TelaPrincipal extends JFrame {
         btnTopObras = new JButton("Top Obras");
         btnAtualizar = new JButton("Atualizar");
         btnDesativar = new JButton("Desativar");
-        btnRemover = new JButton("Remover");
 
         menu.add(btnCadastrar);
         menu.add(btnListar);
@@ -63,7 +61,6 @@ public class TelaPrincipal extends JFrame {
         menu.add(btnTopObras);
         menu.add(btnAtualizar);
         menu.add(btnDesativar);
-        menu.add(btnRemover);
 
         painel.add(menu, BorderLayout.WEST);
 
@@ -114,7 +111,31 @@ public class TelaPrincipal extends JFrame {
         btnTopObras.addActionListener(e -> top());
         btnAtualizar.addActionListener(e -> atualizar());
         btnDesativar.addActionListener(e -> desativar());
-        btnRemover.addActionListener(e -> remover());
+    }
+
+    // lidar com campos inválidos
+    private boolean campoInvalido(Object valor, String nomeCampo) {
+        if (valor == null) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Erro: o campo \"" + nomeCampo + "\" não pode ser nulo.",
+                    "Campo obrigatório",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return true;
+        }
+
+        if (valor instanceof String && ((String) valor).trim().isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Erro: o campo \"" + nomeCampo + "\" não pode estar vazio.",
+                    "Campo obrigatório",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return true;
+        }
+
+        return false;
     }
 
     // CADASTRAR OBRA
@@ -127,10 +148,13 @@ public class TelaPrincipal extends JFrame {
                     JOptionPane.QUESTION_MESSAGE, null, tipos, tipos[0]
             );
 
-            if (tipo == null) return;
+            if (campoInvalido(tipo, "Tipo")) return;
 
             String titulo = JOptionPane.showInputDialog("Título:");
+            if (campoInvalido(titulo, "Título")) return;
+
             String autor = JOptionPane.showInputDialog("Autor:");
+            if (campoInvalido(autor, "Autor")) return;
 
             Obra obra;
 
@@ -211,10 +235,11 @@ public class TelaPrincipal extends JFrame {
     }
 
     private void buscarAutor() {
-        String a = JOptionPane.showInputDialog("Autor:");
+        String autor = JOptionPane.showInputDialog("Autor:");
         StringBuilder sb = new StringBuilder();
+        if (campoInvalido(autor, "Autor")) return;
 
-        for (Obra o : sistema.buscarPorAutor(a)) {
+        for (Obra o : sistema.buscarPorAutor(autor)) {
             sb.append(o.exibirDetalhes()).append("\n");
         }
 
@@ -225,13 +250,19 @@ public class TelaPrincipal extends JFrame {
     private void avaliar() {
         try {
             String titulo = JOptionPane.showInputDialog("Título:");
+            if (campoInvalido(titulo, "Título")) return;
+
             String usuario = JOptionPane.showInputDialog("Usuário");
+            if (campoInvalido(usuario, "Usuário")) return;
 
             int nota = Integer.parseInt(
                     JOptionPane.showInputDialog("Nota (0-10)")
             );
 
+            if (campoInvalido(nota, "Nota")) return;
+
             String comentario = JOptionPane.showInputDialog("Comentário");
+            if (campoInvalido(comentario, "Comentário")) return;
 
             sistema.avaliarObra(
                     titulo,
@@ -256,7 +287,7 @@ public class TelaPrincipal extends JFrame {
     private void atualizar() {
         try {
             String titulo = JOptionPane.showInputDialog("Título da obra:");
-            if (titulo == null) return;
+            if (campoInvalido(titulo, "Título")) return;
 
             Obra antiga = null;
 
@@ -335,19 +366,6 @@ public class TelaPrincipal extends JFrame {
     private void desativar() {
         String t = JOptionPane.showInputDialog("Título:");
         sistema.removerObra(t);
-        salvarEstado();
-        listar();
-    }
-
-    private void remover() {
-        String t = JOptionPane.showInputDialog("Título:");
-
-        for (Obra o : sistema.listarObras()) {
-            if (o.getTitulo().equalsIgnoreCase(t)) {
-                o.setAtiva(false);
-            }
-        }
-
         salvarEstado();
         listar();
     }
